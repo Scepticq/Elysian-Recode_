@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elysian Recode — for Neverlose</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0b0b0d;
+      --card: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-h: rgba(200, 200, 210, 0.3);
+      --text: #e8e8ee;
+      --muted: #8a8a96;
+      --silver: #c8c8d0;
+      --dim: #6e6e78;
+      --radius: 16px;
+      --font-d: "Space Grotesk", system-ui, sans-serif;
+      --font-b: Inter, system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse 120% 80% at 50% -20%, #1a1a22 0%, var(--bg0) 55%);
+      color: var(--text);
+      font-family: var(--font-b);
+      overflow-x: hidden;
+    }
+    #plexus {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
+    }
+    .topbar {
+      display: flex; justify-content: flex-end; gap: 12px; padding: 28px 0 8px;
+    }
+    .icon-btn {
+      width: 44px; height: 44px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--card);
+      backdrop-filter: blur(12px); display: grid; place-items: center;
+      color: var(--dim); text-decoration: none;
+      transition: color .4s, border-color .4s, box-shadow .4s, transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .icon-btn:hover, .icon-btn:focus-visible {
+      color: var(--silver); border-color: var(--border-h);
+      box-shadow: 0 0 28px rgba(200,200,210,.18);
+      transform: translateY(-4px) scale(1.05); outline: none;
+    }
+    .icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .hero { text-align: center; padding: 72px 0 48px; }
+    .hero h1 {
+      font-family: var(--font-d); font-weight: 700;
+      font-size: clamp(2.6rem, 8vw, 4.4rem); letter-spacing: -0.03em; line-height: 1.05;
+      background: linear-gradient(180deg, #fff 0%, var(--silver) 45%, var(--dim) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: rise 1s ease both, breathe 4s ease-in-out 1s infinite;
+    }
+    .hero .sub {
+      margin-top: 14px; font-size: .9rem; font-weight: 500;
+      letter-spacing: .28em; text-transform: uppercase; color: var(--muted);
+      animation: rise 1s ease .15s both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes breathe {
+      0%, 100% { filter: drop-shadow(0 0 28px rgba(200,200,210,.08)); }
+      50% { filter: drop-shadow(0 0 48px rgba(200,200,210,.22)); }
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 12px;
+      perspective: 1200px;
+    }
+    @media (max-width: 800px) {
+      .features { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      position: relative;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      padding: 22px 20px 18px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color .4s, box-shadow .4s, background .4s;
+    }
+    .panel:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 24px 50px rgba(0,0,0,.45), 0 0 36px rgba(200,200,210,.08);
+      background: rgba(255,255,255,.05);
+    }
+    .panel .glow {
+      pointer-events: none;
+      position: absolute; inset: -1px; border-radius: inherit;
+      opacity: 0; transition: opacity .4s;
+      background: radial-gradient(500px circle at var(--mx,50%) var(--my,50%), rgba(200,200,210,.12), transparent 42%);
+    }
+    .panel:hover .glow { opacity: 1; }
+
+    .panel-title {
+      position: relative; z-index: 1;
+      font-family: var(--font-d);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-list {
+      position: relative; z-index: 1;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .panel-list li {
+      font-size: .92rem;
+      font-weight: 500;
+      color: var(--text);
+      padding: 9px 10px;
+      border-radius: 10px;
+      transition: background .35s, color .35s, transform .35s cubic-bezier(.22,1,.36,1), padding-left .35s;
+      cursor: default;
+    }
+    .panel-list li:hover {
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      transform: translateX(4px);
+      padding-left: 14px;
+    }
+    .panel-list li::before {
+      content: "";
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--dim);
+      margin-right: 10px;
+      vertical-align: middle;
+      transition: background .35s, box-shadow .35s;
+    }
+    .panel-list li:hover::before {
+      background: var(--silver);
+      box-shadow: 0 0 8px rgba(200,200,210,.5);
+    }
+
+    .cta {
+      margin-top: 56px; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    .btn-buy {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      min-width: 220px; padding: 16px 40px;
+      font-family: var(--font-d); font-size: 1.05rem; font-weight: 600; letter-spacing: .04em;
+      color: #0b0b0d; text-decoration: none; border: none; border-radius: 14px;
+      background: linear-gradient(180deg, #e8e8ee, var(--silver));
+      box-shadow: 0 0 0 1px rgba(255,255,255,.15), 0 8px 32px rgba(0,0,0,.4), 0 0 40px rgba(200,200,210,.12);
+      cursor: pointer; overflow: hidden;
+      transition: transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s;
+    }
+    .btn-buy:hover, .btn-buy:focus-visible {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.28), 0 16px 48px rgba(0,0,0,.5), 0 0 64px rgba(200,200,210,.22);
+      outline: none;
+    }
+    .btn-buy:active { transform: scale(.98); }
+    .btn-tg {
+      font-size: .88rem; font-weight: 500; color: var(--muted);
+      text-decoration: none; padding: 8px 16px; border-radius: 8px;
+      transition: color .35s, background .35s, letter-spacing .35s;
+    }
+    .btn-tg:hover, .btn-tg:focus-visible {
+      color: var(--silver); background: rgba(255,255,255,.05); letter-spacing: .04em; outline: none;
+    }
+    .mute {
+      position: fixed; bottom: 20px; right: 20px; z-index: 5;
+      width: 40px; height: 40px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card);
+      color: var(--muted); cursor: pointer; font-size: 14px;
+      backdrop-filter: blur(10px); transition: color .3s, border-color .3s, transform .3s;
+    }
+    .mute:hover { color: var(--silver); border-color: var(--border-h); transform: scale(1.05); }
+    footer {
+      text-align: center; margin-top: 64px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: .8rem; color: var(--dim); letter-spacing: .06em;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="plexus"></canvas>
+
+  <div class="wrap">
+    <div class="topbar">
+      <a class="icon-btn" href="https://t.me/elysianremake" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+      </a>
+      <a class="icon-btn" href="https://discord.gg/wjWcnFVSmj" target="_blank" rel="noopener" title="Discord" aria-label="Discord">
+        <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.368-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.368.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+      </a>
+    </div>
+
+    <header class="hero">
+      <h1>Elysian recode</h1>
+      <p class="sub">for neverlose</p>
+    </header>
+
+    <section id="features" class="features">
+      <div class="panel">
+        <div class="glow"></div>
+        <div class="panel-title">Visuals</div>
+        <ul class="panel-list">
+          <li>China hat</li>
+          <li>Player trails</li>
+          <li>Visual tweaks</li>
+          <li>Scope zoom</li>
+          <li>Aspect ratio</li>
+          <li>Manual arrows</li>
+          <li>Viewmodel</li>
+          <li>Custom scope</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <div class="glow"></div>
+        <div class="panel-title">General</div>
+        <ul class="panel-list">
+          <li>Safe head</li>
+          <li>AI peek</li>
+          <li>Air exploit</li>
+          <li>Auto hide shots</li>
+          <li>Legit AA</li>
+          <li>Freestanding</li>
+          <li>Manual yaw</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <div class="glow"></div>
+        <div class="panel-title">Misc</div>
+        <ul class="panel-list">
+          <li>Flick exploit</li>
+          <li>Fast ladder</li>
+          <li>Avoid fall damage</li>
+          <li>Unlock FD speed</li>
+          <li>Unlock fake latency</li>
+          <li>Anim breaker</li>
+          <li>Drink</li>
+          <li>Clantag</li>
+          <li>Trashtalk</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="cta">
+      <a class="btn-buy" id="btn-buy" href="https://funpay.com/users/21319693/" target="_blank" rel="noopener">Buy</a>
+      <a class="btn-tg" href="https://t.me/Sceptiq_1" target="_blank" rel="noopener">or buy in tg</a>
+    </div>
+
+    <footer>Elysian recode · Neverlose</footer>
+  </div>
+
+  <button class="mute" id="mute" type="button" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+
+  <script>
+    /* Links:
+       TG: https://t.me/elysianremake
+       DS: https://discord.gg/wjWcnFVSmj
+       Buy: https://funpay.com/users/21319693/
+       Buy TG: https://t.me/Sceptiq_1
+    */
+
+    /* Plexus */
+    const PARTICLE_COUNT = 95;
+    const LINK_DIST = 150;
+    const PARTICLE_SPEED = 0.4;
+    const MOUSE_RADIUS = 220;
+    const MOUSE_FORCE = 0.12;
+    const MOUSE_REPEL = 0.18;
+    const REPEL_INNER = 70;
+    const LINE_ALPHA = 0.14;
+    const DOT_ALPHA = 0.5;
+
+    let audioCtx = null, muted = false;
+    const muteBtn = document.getElementById("mute");
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+    function tone(freq, dur, type, vol) {
+      if (muted) return;
+      try {
+        ensureAudio();
+        const t = audioCtx.currentTime;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type || "sine";
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(vol || 0.04, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + dur);
+      } catch (e) {}
+    }
+    function clickSound() { tone(420, 0.06, "triangle", 0.05); tone(180, 0.08, "sine", 0.03); }
+    function hoverSound() { tone(520, 0.04, "sine", 0.012); }
+
+    muteBtn.addEventListener("click", () => {
+      muted = !muted;
+      muteBtn.textContent = muted ? "🔇" : "🔊";
+      clickSound();
+    });
+    document.querySelectorAll(".icon-btn, .btn-buy, .btn-tg").forEach((el) => {
+      el.addEventListener("click", clickSound);
+      el.addEventListener("mouseenter", hoverSound);
+    });
+    document.querySelectorAll(".panel").forEach((el) => el.addEventListener("mouseenter", hoverSound));
+
+    document.getElementById("btn-buy").addEventListener("click", function (e) {
+      const rect = this.getBoundingClientRect();
+      const r = document.createElement("span");
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = "position:absolute;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none;width:" + size + "px;height:" + size + "px;left:" + (e.clientX - rect.left - size / 2) + "px;top:" + (e.clientY - rect.top - size / 2) + "px;transform:scale(0);transition:transform .55s ease-out,opacity .55s ease-out;opacity:.7";
+      this.appendChild(r);
+      requestAnimationFrame(() => { r.style.transform = "scale(2.8)"; r.style.opacity = "0"; });
+      setTimeout(() => r.remove(), 600);
+    });
+
+    /* 3D tilt on section panels */
+    document.querySelectorAll(".panel").forEach((panel) => {
+      panel.addEventListener("mousemove", (e) => {
+        const r = panel.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rotY = (x - 0.5) * 10;
+        const rotX = (0.5 - y) * 8;
+        panel.style.transform =
+          "perspective(1100px) rotateX(" + rotX + "deg) rotateY(" + rotY + "deg) translateY(-4px)";
+        panel.style.setProperty("--mx", e.clientX - r.left + "px");
+        panel.style.setProperty("--my", e.clientY - r.top + "px");
+      });
+      panel.addEventListener("mouseleave", () => {
+        panel.style.transform = "perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(0)";
+      });
+    });
+    document.querySelectorAll(".panel-list li").forEach((li) => {
+      li.addEventListener("mouseenter", hoverSound);
+    });
+
+    /* Plexus canvas */
+    const canvas = document.getElementById("plexus");
+    const ctx = canvas.getContext("2d");
+    let w, h, particles = [];
+    const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * PARTICLE_SPEED,
+          vy: (Math.random() - 0.5) * PARTICLE_SPEED
+        });
+      }
+    }
+    window.addEventListener("resize", () => { resize(); initParticles(); });
+    window.addEventListener("mousemove", (e) => {
+      mouse.tx = mouse.x; mouse.ty = mouse.y;
+      mouse.x = e.clientX; mouse.y = e.clientY;
+    });
+    window.addEventListener("mouseleave", () => {
+      mouse.x = mouse.y = mouse.tx = mouse.ty = -9999;
+    });
+
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (dist < MOUSE_RADIUS) {
+          const nx = dx / dist, ny = dy / dist;
+          if (dist < REPEL_INNER) {
+            const f = (1 - dist / REPEL_INNER) * MOUSE_REPEL;
+            p.vx -= nx * f; p.vy -= ny * f;
+          } else {
+            const f = (1 - dist / MOUSE_RADIUS) * MOUSE_FORCE;
+            p.vx += nx * f; p.vy += ny * f;
+          }
+          if (mouse.tx > -9000) {
+            p.vx += (mouse.x - mouse.tx) * 0.003;
+            p.vy += (mouse.y - mouse.ty) * 0.003;
+          }
+        }
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        p.vx *= 0.99; p.vy *= 0.99;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(200,200,210," + DOT_ALPHA + ")";
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const q = particles[j];
+          const ddx = p.x - q.x, ddy = p.y - q.y;
+          const d = Math.sqrt(ddx * ddx + ddy * ddy);
+          if (d < LINK_DIST) {
+            const a = LINE_ALPHA * (1 - d / LINK_DIST);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = "rgba(180,180,190," + a + ")";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    resize(); initParticles(); requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
