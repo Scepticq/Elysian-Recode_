@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elysian Recode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --card: rgba(22, 22, 22, 0.85);
+      --border: rgba(180, 180, 180, 0.14);
+      --text: #e6e6e6;
+      --muted: #8a8a8a;
+      --accent: #b0b0b0;
+      --glow: rgba(160, 160, 160, 0.25);
+      --font: "Space Grotesk", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    #bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, #1a1a1a 0%, var(--bg) 55%);
+    }
+    #plexus { position: fixed; inset: 0; z-index: 1; width: 100%; height: 100%; }
+    .wrap {
+      position: relative; z-index: 2;
+      max-width: 1000px; margin: 0 auto;
+      padding: 28px 20px 90px;
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .logo {
+      font-weight: 700; font-size: 1.15rem; letter-spacing: 0.02em;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .logo span { color: var(--muted); font-weight: 500; font-size: 0.85rem; }
+    .tabs {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 4px;
+    }
+    .tab {
+      border: none; background: transparent; color: var(--muted);
+      padding: 10px 16px; border-radius: 9px; cursor: pointer;
+      font: inherit; font-weight: 500;
+      transition: 0.25s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      box-shadow: 0 0 0 1px var(--border);
+    }
+    .panels { position: relative; min-height: 420px; }
+    .panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      filter: blur(4px);
+      transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.45s cubic-bezier(0.22,1,0.36,1),
+                  filter 0.45s ease;
+      pointer-events: none;
+      position: absolute; left: 0; right: 0; top: 0;
+    }
+    .panel.active {
+      display: block;
+      position: relative;
+      opacity: 1;
+      transform: none;
+      filter: none;
+      pointer-events: auto;
+    }
+    .panel.leaving {
+      display: block;
+      position: absolute;
+      opacity: 0;
+      transform: translateY(-12px) scale(0.97);
+      filter: blur(3px);
+      pointer-events: none;
+    }
+    .hero { text-align: center; padding: 28px 0 20px; }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: var(--text);
+      text-shadow: 0 0 40px var(--glow);
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      display: inline-block;
+    }
+    .hero p {
+      color: var(--muted); margin-top: 10px; font-size: 1.05rem;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .actions {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: center; margin: 26px 0 10px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 22px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text); text-decoration: none;
+      font-family: var(--font);
+      font-weight: 600; cursor: pointer;
+      font-size: 0.95rem;
+      backdrop-filter: blur(12px);
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1),
+                  border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .btn:hover {
+      border-color: rgba(200, 200, 200, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 20px var(--glow);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      border-color: rgba(180, 180, 180, 0.28);
+    }
+    .hint {
+      text-align: center; color: var(--muted); font-size: 0.85rem;
+      margin-bottom: 32px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 16px;
+      backdrop-filter: blur(14px);
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.25s, box-shadow 0.25s;
+      will-change: transform;
+    }
+    .card:hover {
+      border-color: rgba(190, 190, 190, 0.3);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .card h3 {
+      font-size: 0.78rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .card ul { list-style: none; }
+    .card li {
+      color: var(--muted); font-size: 0.92rem;
+      padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .card li:last-child { border: none; }
+    .file-list {
+      margin-top: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .file-list h2 {
+      font-size: 1rem; margin-bottom: 14px; font-weight: 600;
+    }
+    .file-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-wrap: wrap;
+    }
+    .file-row:last-child { border: none; }
+    .file-row span { color: var(--muted); font-size: 0.9rem; }
+    .file-row code {
+      background: rgba(255,255,255,0.05);
+      padding: 4px 8px; border-radius: 6px; font-size: 0.85rem;
+    }
+    .mini { padding: 8px 14px; font-size: 0.85rem; border-radius: 8px; }
+    .warn {
+      margin-top: 16px; padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(180, 180, 180, 0.06);
+      border: 1px solid rgba(180, 180, 180, 0.18);
+      color: #a8a8a8; font-size: 0.85rem;
+    }
+    footer {
+      text-align: center; margin-top: 48px;
+      color: var(--muted); font-size: 0.8rem;
+    }
+    .social { display: flex; gap: 8px; }
+    .social a {
+      width: 42px; height: 42px; border-radius: 10px;
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      color: var(--text); text-decoration: none;
+      background: rgba(255,255,255,0.03);
+      transition: 0.25s;
+    }
+    .social a:hover {
+      border-color: rgba(200,200,200,0.4);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+    }
+    .social a svg {
+      width: 20px; height: 20px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+  <div id="bg"></div>
+  <canvas id="plexus"></canvas>
+
+  <div class="wrap">
+    <nav>
+      <div class="logo tilt-text">Elysian <span>recode</span></div>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="home">Home</button>
+        <button class="tab" data-tab="download">Download</button>
+        <button class="tab" data-tab="crack">Crack NL</button>
+      </div>
+      <div class="social">
+        <a href="https://t.me/elysianremake" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          </svg>
+        </a>
+        <a href="https://discord.gg/wjWcnFVSmj" target="_blank" rel="noopener" title="Discord" aria-label="Discord">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+        </a>
+      </div>
+    </nav>
+
+    <div class="panels">
+      <section id="home" class="panel active">
+        <div class="hero">
+          <h1 class="tilt-text">Elysian recode</h1>
+          <p class="tilt-text">for neverlose · lua · presets · configs</p>
+          <div class="actions">
+            <button class="btn primary tilt-el" id="downloadAllTop" type="button">Download all</button>
+            <button class="btn tilt-el" data-goto="download" type="button">Lua / Preset / Config</button>
+            <button class="btn tilt-el" data-goto="crack" type="button">Crack NL loader</button>
+          </div>
+          <p class="hint">One click · lua + preset + config</p>
+        </div>
+
+        <div class="grid">
+          <div class="card tilt-el">
+            <h3>Visuals</h3>
+            <ul>
+              <li>China hat</li>
+              <li>Player trails</li>
+              <li>Scope zoom</li>
+              <li>Aspect ratio</li>
+              <li>Manual arrows</li>
+              <li>Viewmodel</li>
+              <li>Custom scope</li>
+              <li>Spark impact</li>
+              <li>Map snow</li>
+              <li>Hitmarker / damage</li>
+              <li>Watermark</li>
+              <li>Notifications</li>
+              <li>Keybinds list</li>
+              <li>Side indicators</li>
+              <li>LC / velocity / defensive indicators</li>
+              <li>Israel crosshair</li>
+              <li>Motion blur</li>
+              <li>Custom model</li>
+              <li>Console color</li>
+              <li>Animations</li>
+            </ul>
+          </div>
+          <div class="card tilt-el">
+            <h3>General / AA</h3>
+            <ul>
+              <li>Safe head</li>
+              <li>AI peek</li>
+              <li>Air exploit</li>
+              <li>Auto hide shots</li>
+              <li>Legit AA</li>
+              <li>Freestanding</li>
+              <li>Manual yaw</li>
+              <li>AA builder</li>
+              <li>Defensive states</li>
+              <li>Force defensive</li>
+              <li>Body aim if lethal</li>
+            </ul>
+          </div>
+          <div class="card tilt-el">
+            <h3>Misc</h3>
+            <ul>
+              <li>Flick exploit</li>
+              <li>Fast ladder</li>
+              <li>Avoid fall damage</li>
+              <li>Unlock FD speed</li>
+              <li>Unlock fake latency</li>
+              <li>Anim breaker</li>
+              <li>Drink clantag</li>
+              <li>Custom clantag + stars</li>
+              <li>Trashtalk</li>
+              <li>Kill say</li>
+              <li>Dormant aimbot</li>
+              <li>Jumpscout</li>
+              <li>Airstop</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="panel">
+        <div class="hero">
+          <h1 class="tilt-text">Download</h1>
+          <p class="tilt-text">Lua · preset · config</p>
+          <div class="actions">
+            <button class="btn primary tilt-el" id="downloadAll" type="button">Download all</button>
+          </div>
+          <p class="hint">Browser may ask to allow multiple downloads — click Allow</p>
+        </div>
+        <div class="file-list">
+          <h2>Files</h2>
+          <div class="file-row">
+            <div><code>Elysian_Recode.lua</code><br /><span>main script</span></div>
+            <a class="btn mini tilt-el" href="Elysian_Recode.lua" download>Download</a>
+          </div>
+          <div class="file-row">
+            <div><code>Scepticq presets.txt</code><br /><span>default preset</span></div>
+            <a class="btn mini tilt-el" href="Scepticq%20presets.txt" download="Scepticq presets.txt">Download</a>
+          </div>
+          <div class="file-row">
+            <div><code>cfg.txt</code><br /><span>config</span></div>
+            <a class="btn mini tilt-el" href="cfg.txt" download>Download</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="crack" class="panel">
+        <div class="hero">
+          <h1 class="tilt-text">Crack NL</h1>
+          <p class="tilt-text">loader package</p>
+          <div class="actions">
+            <button class="btn primary tilt-el" id="downloadLoader" type="button">Download loader</button>
+            <button class="btn tilt-el" id="downloadEverything" type="button">Download everything</button>
+          </div>
+        </div>
+        <div class="file-list">
+          <h2>Loader</h2>
+          <div class="file-row">
+            <div><code>NeverloseLauncher.exe</code><br /><span>NL launcher</span></div>
+            <a class="btn mini tilt-el" href="NeverloseLauncher.exe" download>Download</a>
+          </div>
+        </div>
+        <div class="warn">Files must be in the repo root next to index.html.</div>
+      </section>
+    </div>
+
+    <footer>Elysian recode · Neverlose</footer>
+  </div>
+
+  <script>
+    const FILES = {
+      lua: "Elysian_Recode.lua",
+      preset: "Scepticq presets.txt",
+      config: "cfg.txt",
+      loader: "NeverloseLauncher.exe"
+    };
+
+    function downloadOne(url, name) {
+      return new Promise((resolve) => {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name || url.split("/").pop();
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { a.remove(); resolve(); }, 280);
+      });
+    }
+    async function downloadAll(list) {
+      for (const item of list) {
+        await downloadOne(item.url, item.name);
+        await new Promise((r) => setTimeout(r, 400));
+      }
+    }
+    const packMain = [
+      { url: FILES.lua, name: "Elysian_Recode.lua" },
+      { url: FILES.preset, name: "Scepticq presets.txt" },
+      { url: FILES.config, name: "cfg.txt" }
+    ];
+    document.getElementById("downloadAllTop")?.addEventListener("click", () => downloadAll(packMain));
+    document.getElementById("downloadAll")?.addEventListener("click", () => downloadAll(packMain));
+    document.getElementById("downloadLoader")?.addEventListener("click", () => downloadOne(FILES.loader, "NeverloseLauncher.exe"));
+    document.getElementById("downloadEverything")?.addEventListener("click", () => downloadAll([
+      ...packMain,
+      { url: FILES.loader, name: "NeverloseLauncher.exe" }
+    ]));
+
+    const tabs = document.querySelectorAll(".tab");
+    let current = "home";
+    function showTab(id) {
+      if (id === current) return;
+      const prev = document.getElementById(current);
+      const next = document.getElementById(id);
+      if (!next) return;
+      tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === id));
+      if (prev) {
+        prev.classList.add("leaving");
+        prev.classList.remove("active");
+        setTimeout(() => prev.classList.remove("leaving"), 450);
+      }
+      next.classList.add("active");
+      current = id;
+    }
+    tabs.forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
+    document.querySelectorAll("[data-goto]").forEach((b) =>
+      b.addEventListener("click", () => showTab(b.dataset.goto))
+    );
+
+    function bindTilt(el, max = 18) {
+      let rx = 0, ry = 0, tx = 0, ty = 0, raf = 0;
+      function loop() {
+        rx += (tx - rx) * 0.12;
+        ry += (ty - ry) * 0.12;
+        el.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(8px)`;
+        if (Math.abs(tx - rx) > 0.05 || Math.abs(ty - ry) > 0.05) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          raf = 0;
+          if (tx === 0 && ty === 0) {
+            el.style.transform = "perspective(700px) rotateX(0) rotateY(0) translateZ(0)";
+          }
+        }
+      }
+      function kick() {
+        if (!raf) raf = requestAnimationFrame(loop);
+      }
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        ty = (px - 0.5) * max * 2;
+        tx = (0.5 - py) * max * 2;
+        kick();
+      });
+      el.addEventListener("mouseleave", () => {
+        tx = 0; ty = 0; kick();
+      });
+    }
+    document.querySelectorAll(".tilt-el, .tilt-text").forEach((el) => {
+      bindTilt(el, el.classList.contains("tilt-text") ? 12 : 20);
+    });
+
+    const canvas = document.getElementById("plexus");
+    const ctx = canvas.getContext("2d");
+    let w, h, mouse = { x: -9999, y: -9999 };
+    const pts = [];
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+    for (let i = 0; i < 110; i++) {
+      pts.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.55,
+        vy: (Math.random() - 0.5) * 0.55
+      });
+    }
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX; mouse.y = e.clientY;
+    });
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      const radius = 240;
+      const radius2 = radius * radius;
+      for (const p of pts) {
+        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < radius2 && d2 > 0.01) {
+          const d = Math.sqrt(d2);
+          const force = (1 - d / radius) * 4.2;
+          const nx = dx / d, ny = dy / d;
+          p.vx += nx * force;
+          p.vy += ny * force;
+        }
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) { p.x = 0; p.vx = Math.abs(p.vx); }
+        if (p.x > w) { p.x = w; p.vx = -Math.abs(p.vx); }
+        if (p.y < 0) { p.y = 0; p.vy = Math.abs(p.vy); }
+        if (p.y > h) { p.y = h; p.vy = -Math.abs(p.vy); }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(180,180,180,0.65)";
+        ctx.fill();
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const a = pts[i], b = pts[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 160 * 160) {
+            const d = Math.sqrt(d2);
+            const alpha = (1 - d / 160) * 0.28;
+            ctx.strokeStyle = `rgba(160,160,160,${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  </script>
+</body>
+</html>
