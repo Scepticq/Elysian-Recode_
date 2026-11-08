@@ -1152,11 +1152,13 @@ slot_0_63_3 = slot_0_1_0.create(slot_0_61_2.antiaim, "   ", 1)
 slot_0_64_4 = {
 	"\f<sliders>\r  general",
 	"\f<hammer>\r  builder",
-	"\f<shield>\r  defensive"
+	"\f<shield>\r  defensive",
+	"\f<bolt-lightning>\r  exploits"
 }
 slot_0_65_5 = 1
 slot_0_66_5 = 2
 slot_0_67_5 = 3
+slot_0_67_6 = 4
 slot_0_68_5 = slot_0_63_3:list("", slot_0_64_4)
 slot_0_69_4 = slot_0_63_3:list("\nselector", {
 	"\f<gear>\r  main",
@@ -1168,6 +1170,62 @@ slot_0_69_4 = slot_0_63_3:list("\nselector", {
 slot_0_70_5 = 1
 slot_0_71_6 = 2
 slot_0_72_6 = slot_0_1_0.create(slot_0_61_2.antiaim, "         ", 2)
+
+-- AA > exploits tab (from Persistence-style exploits)
+do
+	local dep_tab = { slot_0_68_5, slot_0_67_6 }
+	local ex = {}
+	ex.def_flick = slot_0_63_3:switch("\v\f<bolt-lightning>\r  defensive flick", false):depend(dep_tab)
+	local df = ex.def_flick:create()
+	ex.df_mode = df:combo(slot_0_60_1("mode"), { "Default", "Alternative" }):depend({ ex.def_flick, true })
+	ex.df_yaw_base = df:combo(slot_0_60_1("yaw base"), { "At target", "Local view" }):depend({ ex.def_flick, true })
+	ex.df_states = df:selectable(slot_0_60_1("states"), { "Stand", "Walk", "Move", "Crouch", "Crouch Move" }):depend({ ex.def_flick, true })
+	ex.df_force_hs = df:switch(slot_0_60_1("force hideshot"), false):depend({ ex.def_flick, true })
+	ex.df_hidden_yaw = df:slider(slot_0_60_1("hidden yaw"), -180, 180, -70):depend({ ex.def_flick, true })
+	ex.df_pitch = df:slider(slot_0_60_1("pitch flick"), -89, 89, 89):depend({ ex.def_flick, true })
+	ex.df_indicator = df:switch(slot_0_60_1("indicator"), true):depend({ ex.def_flick, true })
+
+	ex.airlag = slot_0_63_3:switch("\v\f<timeline-arrow>\r  airlag", false):depend(dep_tab)
+	local al = ex.airlag:create()
+	ex.al_legit = al:switch(slot_0_60_1("legit mode"), false):depend({ ex.airlag, true })
+	ex.al_pred = al:slider(slot_0_60_1("predicted ticks"), 8, 12, 12):depend({ ex.airlag, true })
+	ex.al_spam = al:slider(slot_0_60_1("spam every"), 2, 32, 32, 1, "t"):depend({ ex.airlag, true })
+
+	ex.antiskeet = slot_0_63_3:switch("\v\f<transporter-1>\r  anti-skeet", false):depend(dep_tab)
+	local as = ex.antiskeet:create()
+	ex.as_legit = as:switch(slot_0_60_1("legit mode"), false):depend({ ex.antiskeet, true })
+	ex.as_pred = as:slider(slot_0_60_1("predicted ticks"), 8, 12, 12):depend({ ex.antiskeet, true })
+	ex.as_spam = as:slider(slot_0_60_1("spam every"), 2, 32, 32, 1, "t"):depend({ ex.antiskeet, true })
+
+	ex.yaw_bypass = slot_0_63_3:switch("\v\f<arrows-to-dot>\r  extended yaw bypass", false):depend(dep_tab)
+	local yb = ex.yaw_bypass:create()
+	ex.yb_yaw = yb:combo(slot_0_60_1("yaw"), { "Back", "Left", "Right" }):depend({ ex.yaw_bypass, true })
+	ex.yb_base = yb:combo(slot_0_60_1("yaw base"), { "At target", "Local view" }):depend({ ex.yaw_bypass, true })
+	ex.yb_fl = yb:slider(slot_0_60_1("fake lag"), 1, 8, 1, 1, "t"):depend({ ex.yaw_bypass, true })
+	ex.yb_hs = yb:switch(slot_0_60_1("hide shots"), false):depend({ ex.yaw_bypass, true })
+
+	ex.massive_fake = slot_0_63_3:switch("\v\f<arrows-split-up-and-left>\r  massive fake", false):depend(dep_tab)
+	local mf = ex.massive_fake:create()
+	ex.mf_no_air = mf:switch(slot_0_60_1("disable in air"), false):depend({ ex.massive_fake, true })
+	ex.mf_base = mf:combo(slot_0_60_1("yaw base"), { "At target", "Local view" }):depend({ ex.massive_fake, true })
+	ex.mf_side = mf:combo(slot_0_60_1("side"), { "Auto", "Left", "Right" }):depend({ ex.massive_fake, true })
+	ex.mf_yaw = mf:slider(slot_0_60_1("fake yaw"), 0, 360, 70, 1, "°"):depend({ ex.massive_fake, true })
+	ex.mf_pitch = mf:slider(slot_0_60_1("fake pitch"), -89, 89, 0, 1, "°"):depend({ ex.massive_fake, true })
+
+	ex.scoliosis = slot_0_63_3:switch("\v\f<arrows-from-dotted-line>\r  scoliosis exploit", false):depend(dep_tab)
+
+	slot_0_elysian_exploits = ex
+	slot_0_59_0 = slot_0_59_0 or {}
+	slot_0_59_0.aim = slot_0_59_0.aim or {}
+	slot_0_59_0.aim.flick = {
+		enabled = ex.def_flick,
+		hidden_yaw = ex.df_hidden_yaw,
+		pitch_value = ex.df_pitch,
+		indicator = ex.df_indicator,
+		ind_color = { get = function() return color(255, 50, 50, 255) end },
+	}
+end
+
 slot_0_73_4 = {}
 slot_0_74_5 = {}
 slot_0_75_7 = {
@@ -17905,19 +17963,13 @@ events.shutdown(slot_0_115_4)
 
 elysian_safe("flick_init", function()
 	elysian_log("flick_init")
-	if not slot_0_83_6 then elysian_log("flick skip: no misc tab"); return end
-
-	local flick = {
-		enabled = slot_0_83_6:switch("\v\f<bolt>\r  flick exploit", false)
-	}
-	local fl = flick.enabled:create()
-	flick.hidden_yaw = fl:slider(slot_0_60_1("hidden yaw"), -180, 180, -70)
-	flick.pitch_value = fl:slider(slot_0_60_1("pitch flick value"), -89, 89, 89)
-	flick.indicator = fl:switch(slot_0_60_1("indicator"), true)
-	flick.ind_color = fl:color_picker(slot_0_60_1("indicator color"), color(255, 50, 50, 255)):depend({ flick.indicator, true })
-
+	-- flick exploit lives under AA > exploits (defensive flick)
 	slot_0_59_0.aim = slot_0_59_0.aim or {}
-	slot_0_59_0.aim.flick = flick
+	local flick = slot_0_59_0.aim.flick
+	if not flick or not flick.enabled then
+		elysian_log("flick skip: exploits tab not ready")
+		return
+	end
 
 	local ref = {
 		aa_tog = ui.find("Aimbot", "Anti Aim", "Angles", "Enabled"),
@@ -20631,6 +20683,65 @@ elysian_safe("crosshair_init", function()
 	end)
 end)
 
+
+
+-- exploits runtime (AA > exploits tab)
+pcall(function()
+	local fake_duck = ui.find("Aimbot", "Anti Aim", "Misc", "Fake Duck")
+	local last_pulse = 0
+	events.createmove(function(cmd)
+		local ex = slot_0_elysian_exploits
+		if not ex then return end
+		local lp = entity.get_local_player()
+		if not lp or not lp:is_alive() then return end
+
+		-- scoliosis: force fake duck
+		if ex.scoliosis and ex.scoliosis:get() then
+			pcall(function()
+				if fake_duck then
+					if fake_duck.override then fake_duck:override(true) end
+					if fake_duck.set then fake_duck:set(true) end
+				end
+			end)
+		end
+
+		-- airlag / anti-skeet: pulse force_defensive on interval
+		local function pulse_fd(sw, spam_ref)
+			if not sw or not sw:get() then return end
+			local every = 16
+			pcall(function() every = spam_ref:get() or 16 end)
+			local tick = globals.tickcount or 0
+			if tick - last_pulse >= every then
+				last_pulse = tick
+				pcall(function() cmd.force_defensive = true end)
+			end
+		end
+		pulse_fd(ex.airlag, ex.al_spam)
+		pulse_fd(ex.antiskeet, ex.as_spam)
+
+		-- massive fake: write view angles when enabled
+		if ex.massive_fake and ex.massive_fake:get() and cmd and cmd.view_angles then
+			local in_air = false
+			pcall(function() in_air = bit.band(lp.m_fFlags or 0, 1) == 0 end)
+			local skip = false
+			pcall(function() skip = ex.mf_no_air:get() and in_air end)
+			if not skip then
+				local pitch, yaw = 0, 70
+				pcall(function() pitch = ex.mf_pitch:get() end)
+				pcall(function() yaw = ex.mf_yaw:get() end)
+				local side = "Auto"
+				pcall(function() side = ex.mf_side:get() end)
+				if side == "Left" then yaw = -math.abs(yaw)
+				elseif side == "Right" then yaw = math.abs(yaw)
+				elseif side == "Auto" then
+					yaw = ((globals.tickcount or 0) % 2 == 0) and math.abs(yaw) or -math.abs(yaw)
+				end
+				cmd.view_angles.x = pitch
+				cmd.view_angles.y = yaw
+			end
+		end
+	end)
+end)
 
 elysian_safe("post_init", function()
 	elysian_log("=== script load finished ===")
